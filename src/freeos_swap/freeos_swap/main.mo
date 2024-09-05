@@ -3,7 +3,7 @@ import Blob "mo:base/Blob";
 import Nat "mo:base/Nat";
 import Text "mo:base/Text";
 import Error "mo:base/Error";
-import Array "mo:base/Array";
+// import Array "mo:base/Array";
 
 actor {
   type Subaccount = Blob;
