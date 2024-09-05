@@ -3,7 +3,8 @@ import Blob "mo:base/Blob";
 import Nat "mo:base/Nat";
 import Text "mo:base/Text";
 import Error "mo:base/Error";
-// import Array "mo:base/Array";
+import Time "mo:base/Time";
+import Timer "mo:base/Timer";
 
 actor {
   type Subaccount = Blob;
@@ -51,18 +52,10 @@ actor {
     icrc1_transfer : (TransferArg) -> async TransferResult;
   };
 
-  // Log function that stores messages in an array
-  // private stable var logs : [Text] = [];
-  // private func log(message : Text) {
-  //   logs := Array.append(logs, [message]);
-  // };
-
-  // public query func getLogs() : async [Text] {
-  //   logs
-  // };
+  // Timer variable to store the timer ID
+  var mintTimer : Timer.TimerId = 0;
 
   public shared func mint() : async Result<Nat, Text> {
-    // not required: let _from_principal = Principal.fromText("oi3ng-j6cnw-owsv3-4gtwq-nqfhh-ghwzh-assfr-khsv2-d37rq-2ejnj-xqe");
     let to_principal = Principal.fromText("blwz3-4wsku-3otjv-yriaj-2hhdr-3gh3e-x4z7v-psn6e-ent7z-eytoo-mqe");
     let memoText = "Test transfer";
     let memoBlob = Text.encodeUtf8(memoText);
@@ -91,5 +84,24 @@ actor {
     };
   };
 
-  
+  // Heartbeat function to run mint every 30 seconds
+  system func heartbeat() : async () {
+    if (mintTimer == 0) {
+      mintTimer := Timer.setTimer(#seconds 30, heartbeatCallback);
+    };
+  };
+
+  // Callback function for the timer
+  func heartbeatCallback() : async () {
+    ignore mint();
+    mintTimer := Timer.setTimer(#seconds 30, heartbeatCallback);
+  };
+
+  // Function to stop the minting process
+  public func stopMinting() : async () {
+    if (mintTimer != 0) {
+      Timer.cancelTimer(mintTimer);
+      mintTimer := 0;
+    };
+  };
 };
