@@ -1,0 +1,27 @@
+{
+  "canisters": {
+    "freeos_swap": {
+      "main": "src/freeos_swap/freeos_swap/main.mo",
+      "type": "motoko"
+    },
+    "icrc1_ledger": {
+      "type": "custom",
+      "candid": "src/lift/icrc1_ledger.did",
+      "wasm": "src/lift/icrc1_ledger.wasm.gz"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "networks": {
+    "local": {
+      "bind": "127.0.0.1:8000",
+      "type": "ephemeral"
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}

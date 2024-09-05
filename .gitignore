@@ -1,0 +1,27 @@
+# Ignore dfx generated files and build artifacts
+/.dfx/
+/canister_ids.json
+/canisters/
+
+# Ignore VSCode config
+.vscode/
+
+# Ignore macOS system files
+.DS_Store
+
+# Ignore temporary files
+*.log
+*.tmp
+
+# Ignore IDE/editor specific files
+.idea/
+*.iml
+
+# Ignore generated documentation
+/docs/
+
+# Ignore build directories (if you have any custom build steps)
+dist/
+build/
+out/
+target/
