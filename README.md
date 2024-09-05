@@ -1,14 +1,16 @@
-# Using icrc1_ledger canister
+# Using icrc1_ledger and freeos_swap canisters
 
 This set of canisters creates LIFT (Lift Cash) token.
-Then it demonstrates how to mint by transferring from the minter id to a user.
+Then it demonstrates how to mint by calling the freeos_swap canister's mint function.
+
+N.B. You will have to create your own ids, e.g. for the recipient user specified in freeos_swap main.mo
 
 ## Step 1: Download the latest icrc1_ledger wasm and did file
 
-Run the command:
-`source download_latest_icrc1_ledger.sh`
+Run the (Linux/Mac) command :
+`source ./download_latest_icrc1_ledger.sh`
 
-These files should be placed in the src/lift directory
+The files (icrc1_ledger.did and icrc1_ledger.wasm.gz) should be placed in the src/lift directory
 
 ## Step 2: Build all of the canisters
 
@@ -20,14 +22,14 @@ Run the command:
 Run the command:
 `dfx deploy freeos_swap`
 
-Take note of the canister id. This is the 'minter principal' required by the icrc1_ledger. The freeos_swap canister will become the only entity capable of minting tokens.
+Take note of the canister id. This is the 'minter principal' required by the icrc1_ledger. The freeos_swap canister will become the only entity capable of minting tokens in the icrc1_ledger.
 
 ## Step 4: Set up the environment variables used in step 5:
 
-Edit set_env.sh to define the MINTER setting. Set MINTER equal to the freeos_swap canister id.
+Edit set_env.sh to set MINTER equal to the freeos_swap canister id.
 
-Run this command:
-`source set_env.sh`
+Then run this shell file using this (Linux/Mac) command:
+`source ./set_env.sh`
 
 ## Step 5: Command to deploy the icrc1_ledger canister:
 

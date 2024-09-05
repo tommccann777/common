@@ -52,17 +52,17 @@ actor {
   };
 
   // Log function that stores messages in an array
-  private stable var logs : [Text] = [];
-  private func log(message : Text) {
-    logs := Array.append(logs, [message]);
-  };
+  // private stable var logs : [Text] = [];
+  // private func log(message : Text) {
+  //   logs := Array.append(logs, [message]);
+  // };
 
-  public query func getLogs() : async [Text] {
-    logs
-  };
+  // public query func getLogs() : async [Text] {
+  //   logs
+  // };
 
   public shared func mint() : async Result<Nat, Text> {
-    let _from_principal = Principal.fromText("oi3ng-j6cnw-owsv3-4gtwq-nqfhh-ghwzh-assfr-khsv2-d37rq-2ejnj-xqe");
+    // not required: let _from_principal = Principal.fromText("oi3ng-j6cnw-owsv3-4gtwq-nqfhh-ghwzh-assfr-khsv2-d37rq-2ejnj-xqe");
     let to_principal = Principal.fromText("blwz3-4wsku-3otjv-yriaj-2hhdr-3gh3e-x4z7v-psn6e-ent7z-eytoo-mqe");
     let memoText = "Test transfer";
     let memoBlob = Text.encodeUtf8(memoText);
