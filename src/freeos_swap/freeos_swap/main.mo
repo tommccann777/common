@@ -1,3 +1,4 @@
+import Debug "mo:base/Debug";
 import Principal "mo:base/Principal";
 import Blob "mo:base/Blob";
 import Nat "mo:base/Nat";
@@ -5,6 +6,7 @@ import Text "mo:base/Text";
 import Error "mo:base/Error";
 import Time "mo:base/Time";
 import Timer "mo:base/Timer";
+import Int "mo:base/Int";
 
 actor {
   type Subaccount = Blob;
@@ -47,6 +49,25 @@ actor {
     #Ok : BlockIndex;
     #Err : TransferError;
   };
+
+  // HTTPRequest types
+  type HttpHeader = { name : Text; value : Text };
+  type HttpRequest = {
+    url : Text;
+    method : Text;
+    body : [Nat8];
+    headers : [HttpHeader];
+  };
+  type HttpResponse = {
+    status : Nat;
+    headers : [HttpHeader];
+    body : [Nat8];
+  };
+  type IC = actor {
+    http_request : HttpRequest -> async HttpResponse;
+  };
+
+
 
   let ledger_canister = actor ("mxzaz-hqaaa-aaaar-qaada-cai") : actor {
     icrc1_transfer : (TransferArg) -> async TransferResult;
@@ -104,4 +125,45 @@ actor {
       mintTimer := 0;
     };
   };
+
+public func makeHttpPostRequest() : async Text {
+    let url = "https://api-xprnetwork-main.saltant.io/v1/chain/get_table_rows";
+    
+    // Prepare the POST body
+    let postBody = "{\"json\":true,\"code\":\"eosio.token\",\"lower_bound\":\"XPR\",\"upper_bound\":\"XPR\",\"table\":\"accounts\",\"scope\":\"tommccann\",\"limit\":1}";
+    let bodyAsBlob = Text.encodeUtf8(postBody);
+    
+    let request : HttpRequest = {
+      url = url;
+      method = "POST";
+      body = Blob.toArray(bodyAsBlob);
+      headers = [
+        { name = "Content-Type"; value = "application/json" },
+        { name = "User-Agent"; value = "Motoko-HTTP-Client" },
+      ];
+    };
+
+    try {
+      let ic : IC = actor("aaaaa-aa");
+      Debug.print("About to call http_request with postBody = " # postBody);
+      let response : HttpResponse = await ic.http_request(request);
+
+      // Log response status and headers for debugging
+      Debug.print("Response status: " # debug_show(response.status));
+      Debug.print("Response headers: " # debug_show(response.headers));
+
+      if (response.status >= 200 and response.status < 300) {
+        switch (Text.decodeUtf8(Blob.fromArray(response.body))) {
+          case null { "Error: Couldn't decode response body" };
+          case (?decoded) { decoded };
+        }
+      } else {
+        "Error: HTTP request failed with status " # Int.toText(response.status)
+      }
+    } catch (error) {
+      Debug.print("Error making HTTP request: " # Error.message(error));
+      "Error occurred"
+    }
+  }
+  
 };

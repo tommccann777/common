@@ -2,7 +2,11 @@
   "canisters": {
     "freeos_swap": {
       "main": "src/freeos_swap/freeos_swap/main.mo",
-      "type": "motoko"
+      "type": "motoko",
+      "http_outcalls": {
+        "allow_raw_access": true,
+        "urls": ["http://proton.eoscafeblock.com"]
+      }
     },
     "icrc1_ledger": {
       "type": "custom",
