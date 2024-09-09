@@ -7,6 +7,8 @@ import Error "mo:base/Error";
 import Time "mo:base/Time";
 import Timer "mo:base/Timer";
 import Int "mo:base/Int";
+import Cycles "mo:base/ExperimentalCycles";
+import Result "mo:base/Result";
 
 actor {
   type Subaccount = Blob;
@@ -35,14 +37,14 @@ actor {
   type BlockIndex = Nat;
 
   type TransferError = {
-    BadFee : { expected_fee : Tokens };
-    BadBurn : { min_burn_amount : Tokens };
-    InsufficientFunds : { balance : Tokens };
-    TooOld : Nat;
-    CreatedInFuture : { ledger_time : Timestamp };
-    TemporarilyUnavailable : Nat;
-    Duplicate : { duplicate_of : BlockIndex };
-    GenericError : { error_code : Nat; message : Text };
+    #BadFee : { expected_fee : Tokens };
+    #BadBurn : { min_burn_amount : Tokens };
+    #InsufficientFunds : { balance : Tokens };
+    #TooOld;
+    #CreatedInFuture : { ledger_time : Timestamp };
+    #TemporarilyUnavailable;
+    #Duplicate : { duplicate_of : BlockIndex };
+    #GenericError : { error_code : Nat; message : Text };
   };
 
   type TransferResult = {
@@ -126,7 +128,7 @@ actor {
     };
   };
 
-public func makeHttpPostRequest() : async Text {
+public func makeHttpPostRequest() : async Result.Result<Text, Text> {
     let url = "https://api-xprnetwork-main.saltant.io/v1/chain/get_table_rows";
     
     // Prepare the POST body
@@ -144,6 +146,9 @@ public func makeHttpPostRequest() : async Text {
     };
 
     try {
+    // Add cycles
+    Cycles.add(21_850_258_000);
+
       let ic : IC = actor("aaaaa-aa");
       Debug.print("About to call http_request with postBody = " # postBody);
       let response : HttpResponse = await ic.http_request(request);
@@ -154,15 +159,19 @@ public func makeHttpPostRequest() : async Text {
 
       if (response.status >= 200 and response.status < 300) {
         switch (Text.decodeUtf8(Blob.fromArray(response.body))) {
-          case null { "Error: Couldn't decode response body" };
-          case (?decoded) { decoded };
+          case null { #err("Error: Couldn't decode response body") };
+          case (?decoded) { #ok(decoded) };
         }
       } else {
-        "Error: HTTP request failed with status " # Int.toText(response.status)
+        let responseBodyText = switch (Text.decodeUtf8(Blob.fromArray(response.body))) {
+                case null { "<unable to decode body>" };
+                case (?decoded) { decoded };
+            };
+            #err("HTTP request failed with status " # Int.toText(response.status) # ". Response body: " # responseBodyText)
       }
     } catch (error) {
       Debug.print("Error making HTTP request: " # Error.message(error));
-      "Error occurred"
+      #err("Failed to make HTTP request: " # Error.message(error))
     }
   }
   
