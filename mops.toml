@@ -1,0 +1,4 @@
+[dependencies]
+base = "0.11.2"
+serde = "3.2.1"
+xtended-text = "0.3.0"

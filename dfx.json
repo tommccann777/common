@@ -5,7 +5,9 @@
       "type": "motoko",
       "http_outcalls": {
         "allow_raw_access": true,
-        "urls": ["http://proton.eoscafeblock.com"]
+        "urls": [
+          "http://proton.eoscafeblock.com"
+        ]
       }
     },
     "icrc1_ledger": {
@@ -17,7 +19,7 @@
   "defaults": {
     "build": {
       "args": "",
-      "packtool": ""
+      "packtool": "mops sources"
     }
   },
   "networks": {
